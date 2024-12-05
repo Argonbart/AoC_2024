@@ -41,20 +41,27 @@ fn main() {
         // Check rules for every line
         'outer: for number_position in 0..update.len() {
             let current_number = update.get(number_position).unwrap();
-            for follow_number in rules_lookup.get(&current_number).unwrap().to_vec() {
-                // If following number appeared before = Violation, so break
-                if read_numbers.contains(&follow_number) {
-                    valid_update = false;
-                    break 'outer;
+            if rules_lookup.get(&current_number) == None {
+                break;
+            } else {
+                for follow_number in rules_lookup.get(&current_number).unwrap().to_vec() {
+                    // If following number appeared before = Violation, so break
+                    if read_numbers.contains(&follow_number) {
+                        valid_update = false;
+                        break 'outer;
+                    }
                 }
             }
             // Add to list of numbers that appeared before
             read_numbers.push(*current_number);
         }
 
-        // If no violation occured, add middle number
-        if valid_update {
-            sum += update.get(update.len() / 2).unwrap();
+        // If violation occured, fix the update and add middle number
+        dbg!(update.clone());
+        if !valid_update {
+            let updated = fix_update(update.clone(), rules_lookup.clone());
+            dbg!(updated.clone());
+            sum += updated.get(updated.len() / 2).unwrap();
         }
 
         // Reset
@@ -65,4 +72,43 @@ fn main() {
 
     // Output result
     println!("Result: {:?}", sum);
+}
+
+// Fix updates with violations
+fn fix_update(update: Vec<i32>, lookup: HashMap<i32, Vec<i32>>) -> Vec<i32> {
+    // Make copy
+    let mut update_array = update.clone();
+    let mut changed_last_iteration = true;
+
+    // Reiterate till no changes made = no violations anymore
+    while changed_last_iteration {
+        changed_last_iteration = false;
+        let mut read_numbers: Vec<i32> = Vec::new();
+        // For every number
+        for current_number in update_array.clone().iter() {
+            // Look up all constraints
+            for follow_number in lookup.get(&current_number).unwrap() {
+                // If violate
+                if read_numbers.contains(follow_number) {
+                    let current_pos = update_array
+                        .iter()
+                        .position(|n| n == current_number)
+                        .unwrap();
+                    let follow_pos = update_array
+                        .iter()
+                        .position(|n| n == follow_number)
+                        .unwrap();
+                    // Then swap
+                    update_array[current_pos] = *follow_number;
+                    update_array[follow_pos] = *current_number;
+                    changed_last_iteration = true
+                }
+            }
+            // Add to read numbers
+            read_numbers.push(*current_number);
+        }
+        read_numbers.clear();
+    }
+    // Return array when no violations anymore
+    return update_array;
 }
