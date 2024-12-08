@@ -1,0 +1,1 @@
+C:\Users\User\Desktop\AdventOfCode2024\AoC_2024\day7\day7-part1\target\debug\day7-part1.exe: C:\Users\User\Desktop\AdventOfCode2024\AoC_2024\day7\day7-part1\input.txt C:\Users\User\Desktop\AdventOfCode2024\AoC_2024\day7\day7-part1\src\main.rs
