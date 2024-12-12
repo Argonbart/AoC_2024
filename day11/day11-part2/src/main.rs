@@ -1,108 +1,88 @@
+use std::collections::HashMap;
+
 use count_digits::CountDigits;
 
 fn main() {
     // Read Input
     let input = include_str!("../input.txt");
-    let numbers: Vec<u128> = input
+    let numbers: Vec<i64> = input
         .split(" ")
-        .map(|x| x.parse::<u128>().unwrap())
+        .map(|x| x.parse::<i64>().unwrap())
         .collect();
 
-    // Brute force through all numbers
-    let mut input_stones: Vec<u128> = numbers.clone();
-    let mut output_stones: Vec<u128> = Vec::new();
+    // Variables
+    let mut input_dict: HashMap<i64, i64> = HashMap::new();
+    let mut output_dict: HashMap<i64, i64> = HashMap::new();
     let blink_amounts = 75;
-    let mut result: usize = 0;
-    let mut step_counter = 0;
+    let mut result: i64 = 0;
 
-    // Caching
-    // let mut
-
-    for _blink in 0..blink_amounts {
-        for stone in input_stones.iter() {
-            let digit_amount = stone.count_digits();
-            if digit_amount == 1 {
-                result += calculate_digit_multiplications(stone, step_counter);
-            } else if stone.count_digits() % 2 == 0 {
-                const RADIX: u32 = 10;
-                let stone_string = stone.to_string();
-                let stone_chars = stone_string.chars();
-                let stone_length = stone_chars.clone().count();
-                let first_part: Vec<u128> = stone_chars
-                    .clone()
-                    .take(stone_length / 2)
-                    .map(|x| x.to_digit(RADIX).unwrap() as u128)
-                    .collect();
-
-                let second_part: Vec<u128> = stone_chars
-                    .clone()
-                    .skip(stone_length / 2)
-                    .map(|x| x.to_digit(RADIX).unwrap() as u128)
-                    .collect();
-                let first_number = first_part.iter().fold(0, |acc, elem| acc * 10 + elem);
-                let second_number = second_part.iter().fold(0, |acc, elem| acc * 10 + elem);
-                output_stones.push(first_number);
-                output_stones.push(second_number);
-            } else {
-                output_stones.push(stone * 2024);
-            }
+    // Fill first input_dict
+    for number in numbers {
+        if input_dict.contains_key(&number) {
+            *input_dict.get_mut(&number).unwrap() += 1;
+        } else {
+            input_dict.insert(number, 1);
         }
-        // result = output_stones.clone();
-        println!("Step {:?}: {:?}", step_counter, output_stones);
-        step_counter += 1;
-        input_stones = output_stones.clone();
-        output_stones.clear();
     }
 
-    result += input_stones.iter().count();
+    // Go blink by blink
+    for _blink in 0..blink_amounts {
+        // Check every dict entry, perform tranformation for whole bunch of numbers
+        for entry in input_dict.iter() {
+            let input_number = entry.0;
+            let input_number_amount = entry.1;
+            // dict entry is zero
+            if input_number == &0 {
+                let new_number = 1;
+                if output_dict.contains_key(&new_number) {
+                    *output_dict.get_mut(&new_number).unwrap() += input_number_amount;
+                } else {
+                    output_dict.insert(new_number, *input_number_amount);
+                }
+            }
+            // dict entry has even amount of digits
+            else if input_number.count_digits() % 2 == 0 {
+                let stone_string = input_number.to_string();
+                let stone_length = stone_string.len();
+                let first_string = &stone_string[..stone_length / 2];
+                let second_string = &stone_string[(stone_length / 2)..stone_length];
+                let first_number = first_string.parse::<i64>().unwrap();
+                let second_number = second_string.parse::<i64>().unwrap();
+
+                let new_number = first_number;
+                if output_dict.contains_key(&new_number) {
+                    *output_dict.get_mut(&new_number).unwrap() += input_number_amount;
+                } else {
+                    output_dict.insert(new_number, *input_number_amount);
+                }
+
+                let new_number = second_number;
+                if output_dict.contains_key(&new_number) {
+                    *output_dict.get_mut(&new_number).unwrap() += input_number_amount;
+                } else {
+                    output_dict.insert(new_number, *input_number_amount);
+                }
+            }
+            // dict entry has odd amount of digits
+            else {
+                let new_number = input_number * 2024;
+                if output_dict.contains_key(&new_number) {
+                    *output_dict.get_mut(&new_number).unwrap() += input_number_amount;
+                } else {
+                    output_dict.insert(new_number, *input_number_amount);
+                }
+            }
+        }
+        // Reset dict for next blink
+        input_dict = output_dict.clone();
+        output_dict.clear();
+    }
+
+    // Count final step dict counts
+    for entry in input_dict.values() {
+        result += entry;
+    }
 
     // Output Result
     println!("Result: {:?}", result);
 }
-
-fn calculate_digit_multiplications(stone: &u128, step_counter: usize) -> usize {
-    match stone {
-        0 => return 0,
-        1 => return 0,
-        2 => return 0,
-        3 => return 0,
-        4 => return 0,
-        5 => return 0,
-        6 => return 0,
-        7 => return 0,
-        8 => return 0,
-        9 => return 0,
-        16192 => return 0,
-        _ => return 0,
-    }
-}
-
-//
-//
-//
-
-// 89741 ->
-// 316108 ->
-// 7641 -> 7 6 4 1
-// 756 -> 6 2 6 8 3 2 8 0 2 3 1 8 6 9 4 4
-// 7832357 ->
-// 91 -> 9 1
-
-// ---------------------
-
-// STEP
-// 0     - 1        - 2         - 3           - 4                    - 5
-
-// 0     - 1        -           -             -                      -
-// 1     - 2024     - 20 24     - 2 0 2 4     -                      -
-// 2     - 4048     - 40 48     - 4 0 4 8     -                      -
-// 3     - 6072     - 60 72     - 6 0 7 2     -                      -
-// 4     - 8096     - 80 96     - 8 0 9 6     -                      -
-
-// 5     - 10120    - 20482880  - 2048 2880   - 20 48 28 80          - 2 0 4 8 2 8 8 0
-// 6     - 12144    - 24579456  - 2457 9456   - 24 57 94 56          - 2 4 5 7 9 4 5 6
-// 7     - 14168    - 28676032  - 2867 6032   - 28 67 60 32          - 2 8 6 7 6 0 3 2
-// 8     - 16192    - 32772608  - 3277 2608   - 32 77 26  8          - 3 2 7 7 2 6 8 16192
-// 9     - 18216    - 36869184  - 3686 9184   - 36 86 91 84          - 3 6 8 6 9 1 8 4
-
-// 16192 - 32772608 - 3277 2608 - 32 77 26  8 - 3 2 7 7 2 6 8 16192
