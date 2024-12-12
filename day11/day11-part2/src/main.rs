@@ -12,21 +12,20 @@ fn main() {
     let mut input_stones: Vec<u128> = numbers.clone();
     let mut output_stones: Vec<u128> = Vec::new();
     let blink_amounts = 75;
-    let mut result: Vec<u128> = [1].to_vec();
+    let mut result: usize = 0;
     let mut step_counter = 0;
-    println!("Step {:?}: {:?}", step_counter, result);
-    step_counter += 1;
 
     // Caching
+    // let mut
 
     for _blink in 0..blink_amounts {
         for stone in input_stones.iter() {
-            if stone == &0 {
-                output_stones.push(1);
-            }
-            if stone.count_digits() % 2 == 0 {
+            let digit_amount = stone.count_digits();
+            if digit_amount == 1 {
+                result += calculate_digit_multiplications(stone, step_counter);
+            } else if stone.count_digits() % 2 == 0 {
                 const RADIX: u32 = 10;
-                let stone_string: String = stone.to_string();
+                let stone_string = stone.to_string();
                 let stone_chars = stone_string.chars();
                 let stone_length = stone_chars.clone().count();
                 let first_part: Vec<u128> = stone_chars
@@ -48,16 +47,39 @@ fn main() {
                 output_stones.push(stone * 2024);
             }
         }
-        result = output_stones.clone();
-        println!("Step {:?}", step_counter);
+        // result = output_stones.clone();
+        println!("Step {:?}: {:?}", step_counter, output_stones);
         step_counter += 1;
         input_stones = output_stones.clone();
         output_stones.clear();
     }
 
+    result += input_stones.iter().count();
+
     // Output Result
-    // println!("Result: {:?}", result);
+    println!("Result: {:?}", result);
 }
+
+fn calculate_digit_multiplications(stone: &u128, step_counter: usize) -> usize {
+    match stone {
+        0 => return 0,
+        1 => return 0,
+        2 => return 0,
+        3 => return 0,
+        4 => return 0,
+        5 => return 0,
+        6 => return 0,
+        7 => return 0,
+        8 => return 0,
+        9 => return 0,
+        16192 => return 0,
+        _ => return 0,
+    }
+}
+
+//
+//
+//
 
 // 89741 ->
 // 316108 ->
@@ -69,16 +91,18 @@ fn main() {
 // ---------------------
 
 // STEP
-// 0 - 1     - 2        - 3         - 4           - 5
+// 0     - 1        - 2         - 3           - 4                    - 5
 
-// 0 - 1     -          -           -             -
-// 1 - 2024  - 20 24    - 2 0 2 4   -             -
-// 2 - 4048  - 40 48    - 4 0 4 8   -             -
-// 3 - 6072  - 60 72    - 6 0 7 2   -             -
-// 4 - 8096  - 80 96    - 8 0 9 6   -             -
+// 0     - 1        -           -             -                      -
+// 1     - 2024     - 20 24     - 2 0 2 4     -                      -
+// 2     - 4048     - 40 48     - 4 0 4 8     -                      -
+// 3     - 6072     - 60 72     - 6 0 7 2     -                      -
+// 4     - 8096     - 80 96     - 8 0 9 6     -                      -
 
-// 5 - 10120 - 20482880 - 2048 2880 - 20 48 28 80 - 2 0 4 8 2 8 8 0
-// 6 - 12144 - 24579456 - 2457 9456 - 24 57 94 56 - 2 4 5 7 9 4 5 6
-// 7 - 14168 - 28676032 - 2867 6032 - 28 67 60 32 - 2 8 6 7 6 0 3 2
-// 8 - 16192 - 32772608 - 3277 2608 - 32 77 26 08 - 3 2 7 7 2 6 0 8
-// 9 - 18216 - 36869184 - 3686 9184 - 36 86 91 84 - 3 6 8 6 9 1 8 4
+// 5     - 10120    - 20482880  - 2048 2880   - 20 48 28 80          - 2 0 4 8 2 8 8 0
+// 6     - 12144    - 24579456  - 2457 9456   - 24 57 94 56          - 2 4 5 7 9 4 5 6
+// 7     - 14168    - 28676032  - 2867 6032   - 28 67 60 32          - 2 8 6 7 6 0 3 2
+// 8     - 16192    - 32772608  - 3277 2608   - 32 77 26  8          - 3 2 7 7 2 6 8 16192
+// 9     - 18216    - 36869184  - 3686 9184   - 36 86 91 84          - 3 6 8 6 9 1 8 4
+
+// 16192 - 32772608 - 3277 2608 - 32 77 26  8 - 3 2 7 7 2 6 8 16192
