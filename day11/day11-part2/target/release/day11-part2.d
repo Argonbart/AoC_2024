@@ -1,1 +1,1 @@
-C:\Users\alexk\OneDrive\Desktop\Advent\ of\ Code\AoC_2024\day11\day11-part2\target\release\day11-part2.exe: C:\Users\alexk\OneDrive\Desktop\Advent\ of\ Code\AoC_2024\day11\day11-part2\input.txt C:\Users\alexk\OneDrive\Desktop\Advent\ of\ Code\AoC_2024\day11\day11-part2\src\main.rs
+C:\Users\User\Desktop\AdventOfCode2024\AoC_2024\day11\day11-part2\target\release\day11-part2.exe: C:\Users\User\Desktop\AdventOfCode2024\AoC_2024\day11\day11-part2\input.txt C:\Users\User\Desktop\AdventOfCode2024\AoC_2024\day11\day11-part2\src\main.rs
